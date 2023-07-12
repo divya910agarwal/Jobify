@@ -1,0 +1,2 @@
+# Jobify
+ MERN Stack implementation
