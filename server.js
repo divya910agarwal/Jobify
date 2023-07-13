@@ -1,13 +1,16 @@
+/* eslint-disable import/no-extraneous-dependencies */
+/* eslint-disable import/first */
 /* eslint-disable prettier/prettier */
 import express from 'express';
 import dotenv from 'dotenv';
+
 const app = express()
 dotenv.config();
-
-//db and authenticateUser
+import 'express-async-errors'
+// db and authenticateUser
 import connectDB from './db/connect.js'
 
-//routers
+// routers
 import authRouter from './routes/authRoutes.js'
 import jobsRouter from './routes/jobsRoutes.js'
 
