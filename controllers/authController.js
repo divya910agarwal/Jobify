@@ -33,6 +33,8 @@ const login = async (req, res) => {
 
 const updateUser = async (req, res) => {
   res.send('UpdateUser');
+  const user = await User.findOne({ _id: req.user.userId });
+
 };
 
 export { register, login, updateUser }

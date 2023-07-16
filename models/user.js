@@ -1,6 +1,8 @@
 /* eslint-disable prettier/prettier */
 import mongoose from 'mongoose';
 import validator from 'validator';
+import bcrypt from 'bcryptjs'
+
 const UserSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -37,5 +39,10 @@ const UserSchema = new mongoose.Schema({
         default: 'my city'
     },
 });
+
+UserSchema.pre('save',function(){
+  console.log(this.password)
+})
+
 
 export default mongoose.model('User',UserSchema)
