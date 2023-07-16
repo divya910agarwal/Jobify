@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { StatusCodes } from "http-status-codes/build/cjs/status-codes";
+import { StatusCodes } from "http-status-codes/build/cjs/status-codes.js";
 
 const errorHandlerMiddleware = (err, req, res, next) => {
     console.log(err);
