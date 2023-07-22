@@ -1,53 +1,63 @@
-/* eslint-disable import/no-extraneous-dependencies */
-/* eslint-disable import/first */
-/* eslint-disable prettier/prettier */
-import express from 'express';
-import dotenv from 'dotenv';
+import express from "express";
+const app = express();
 
-const app = express()
+import dotenv from "dotenv";
 dotenv.config();
-import 'express-async-errors'
-// db and authenticateUser
-import connectDB from './db/connect.js'
 
-// routers
-import authRouter from './routes/authRoutes.js'
-import jobsRouter from './routes/jobsRoutes.js'
+import "express-async-errors";
+import morgan from "morgan";
 
+import { dirname } from "path";
+import { fileURLToPath } from "url";
+import path from "path";
 
-// middleware
+import helmet from "helmet";
+import xss from "xss-clean";
+import mongoSanitize from "express-mongo-sanitize";
 
-import notFoundMiddleware from './middleware/not-found.js'
-import errorHandlerMiddleware from './middleware/error-handler.js'
+import connectDB from "./db/connect.js";
 
-app.use(express.json())
+import authRouter from "./routes/authRoutes.js";
+import jobsRouter from "./routes/jobsRoutes.js";
 
+import notFoundMiddleware from "./middleware/not-found.js";
+import errorHandlerMiddleware from "./middleware/error-handler.js";
+import authenticateUser from "./middleware/auth.js";
 
-app.get('/',(req,res)=>{
-    throw new Error('error')
-    res.send("welcome")
-})
+if (process.env.NODE_ENV !== "production") {
+  app.use(morgan("dev"));
+}
 
-app.use('/api/v1/auth', authRouter)
-app.use('/api/v1/jobs', jobsRouter)
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
-app.use(notFoundMiddleware)
-app.use(errorHandlerMiddleware)
+app.use(express.static(path.resolve(__dirname, "./client/build")));
+app.use(express.json());
 
-const port = process.env.Port || 5000;
+app.use(helmet());
+app.use(xss());
+app.use(mongoSanitize());
 
-app.listen(port,()=>{
-  console.log(`Server is listening on port ${port}...`)
-})
+app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/jobs", authenticateUser, jobsRouter);
+
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve(__dirname, "./client/build", "index.html"));
+});
+
+app.use(notFoundMiddleware);
+app.use(errorHandlerMiddleware);
+
+const port = process.env.PORT || 5000;
 
 const start = async () => {
-    try{
-        await connectDB(process.env.MONGO_URL)
-        app.listen(port, () => {
-            console.log(`Server is listening on port ${port}...`);
-        })
-    } catch (error) {
-        console.log(error);
-    }
-}
+  try {
+    await connectDB(process.env.MONGO_URL);
+    app.listen(port, () =>
+      console.log(`Server is listening on port ${port}...`)
+    );
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 start();

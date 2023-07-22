@@ -1,13 +1,17 @@
-import express from 'express'
+import express from "express";
+const router = express.Router();
+import {
+  createJob,
+  updateJob,
+  deleteJob,
+  getAllJobs,
+  showStats,
+} from "../controllers/jobsController.js";
 
-const router = express.Router()
+import testUser from "../middleware/testUser.js";
 
-
-import { createJob, deleteJob, getAllJobs, updateJob, showStats } from '../controllers/jobsController.js'
-
-router.route('/').post(createJob).get(getAllJobs)
-//place before :id
-router.route('/stats').get(showStats)
-router.route('/:id').delete(deleteJob).patch(updateJob)
+router.route("/").post(testUser, createJob).get(getAllJobs);
+router.route("/stats").get(showStats);
+router.route("/:id").delete(testUser, deleteJob).patch(testUser, updateJob);
 
 export default router;
